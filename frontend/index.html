@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <title>Extended RPS</title>
+</head>
+<body>
+    
+    <div class="header">
+        <h1>Extended RPS</h1>
+    </div>
+    <div class="main-body">
+        <textarea name="" placeholder="What's stronger than..." id="user-entity"></textarea>
+        <h3>vs</h3>
+        <h1 id="system-entity">Rock</h1>
+    </div>
+    <button id="btn" onclick="compareEntity()">Fight!</button>
+    <div class="reason">Enter an entity that you think is stronger than Rock.</div>
+    <div class="score">
+        <div class="score-text">Score: </div>
+        <div class="score-number">0</div>
+    </div>
+
+    <script>
+        function compareEntity() {
+            const userEntity = document.getElementById('user-entity').value;
+            const systemEntity = document.getElementById('system-entity').innerHTML;
+            fetch('http://localhost:5000/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({userEntity: userEntity, systemEntity: systemEntity})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result == "victory") {
+                    document.getElementById('system-entity').innerHTML = userEntity;
+                    document.getElementById("user-entity").value = "";
+                    document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning;
+                    var score = parseInt(document.getElementsByClassName('score-number')[0].innerHTML);
+                    score++;
+                    document.getElementsByClassName('score-number')[0].innerHTML = score;
+                }
+                else if (data.result == "defeat") {
+                    document.getElementById('system-entity').innerHTML = "Rock";
+                    document.getElementById("user-entity").value = "";
+                    document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning + " You finish with a score of " + document.getElementsByClassName('score-number')[0].innerHTML + ".";
+                }
+                else if (data.result == "repeat") {
+                    document.getElementById("user-entity").value = "";
+                    document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
