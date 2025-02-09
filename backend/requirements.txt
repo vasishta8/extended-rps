@@ -1,3 +1,4 @@
+virtualenv==20.29.1
 python-dotenv==1.0.1
 groq==0.18.0
 flask==3.1.0

@@ -52,6 +52,7 @@ def user_vs_system(prompt):
     return parsed_json
 
 def rps_body(user_entity, system_entity, entities_used):
+    # print(user_entity, system_entity, entities_used)
     if user_entity in entities_used:
         return {"result": "repeat", "reasoning": "No repeats allowed!"}
     prompt = create_prompt(user_entity, system_entity)

@@ -5,7 +5,7 @@ from app import rps_body
 app = Flask(__name__)
 CORS(app)
 
-entities_used = set('Rock')
+entities_used = set(["Rock"])
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -15,5 +15,9 @@ def process():
     func_output = rps_body(userEntity, systemEntity, entities_used)
     return jsonify(func_output)
 
+@app.route('/reset', methods=['POST'])
+def reset():
+    entities_used = set(["Rock"])
+    return "dummy"
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

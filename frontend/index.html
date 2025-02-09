@@ -7,7 +7,7 @@
     <title>Extended RPS</title>
 </head>
 <body>
-    
+
     <div class="header">
         <h1>Extended RPS</h1>
     </div>
@@ -17,16 +17,17 @@
         <h1 id="system-entity">Rock</h1>
     </div>
     <button id="btn" onclick="compareEntity()">Fight!</button>
-    <div class="reason">Enter an entity that you think is stronger than Rock.</div>
+    <div class="reason">What's stronger than Rock?</div>
     <div class="score">
-        <div class="score-text">Score: </div>
+        <div class="score-text">Score:</div>
         <div class="score-number">0</div>
     </div>
 
     <script>
+        window.onload = resetSystem();
         function compareEntity() {
-            const userEntity = document.getElementById('user-entity').value;
-            const systemEntity = document.getElementById('system-entity').innerHTML;
+            const userEntity = capitalizeFirstLetter(document.getElementById('user-entity').value);
+            const systemEntity = capitalizeFirstLetter(document.getElementById('system-entity').innerHTML);
             fetch('http://localhost:5000/process', {
                 method: 'POST',
                 headers: {
@@ -39,21 +40,37 @@
                 if (data.result == "victory") {
                     document.getElementById('system-entity').innerHTML = userEntity;
                     document.getElementById("user-entity").value = "";
-                    document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning;
+                    document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning + " What's stronger than " + userEntity + "?";
                     var score = parseInt(document.getElementsByClassName('score-number')[0].innerHTML);
                     score++;
                     document.getElementsByClassName('score-number')[0].innerHTML = score;
                 }
                 else if (data.result == "defeat") {
-                    document.getElementById('system-entity').innerHTML = "Rock";
                     document.getElementById("user-entity").value = "";
                     document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning + " You finish with a score of " + document.getElementsByClassName('score-number')[0].innerHTML + ".";
+                    const resetTimeout = setTimeout(resetSystem, 5000);
                 }
                 else if (data.result == "repeat") {
                     document.getElementById("user-entity").value = "";
                     document.getElementsByClassName('reason')[0].innerHTML =  data.reasoning;
                 }
+            })
+            .catch(error => console.error("Fetch error:", error));
+        }
+        function resetSystem() {
+            document.getElementById('system-entity').innerHTML = "Rock";
+            document.getElementsByClassName('score-number')[0].innerHTML = 0;
+            document.getElementsByClassName('reason')[0].innerHTML = "What's stronger than Rock?";
+            fetch('http://localhost:5000/reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
+        }
+
+        function capitalizeFirstLetter(val) {
+            return String(val).charAt(0).toUpperCase() + String(val).slice(1);
         }
     </script>
 </body>
